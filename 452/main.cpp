@@ -10,7 +10,7 @@ public:
   int findMinArrowShots(vector<vector<int>> &points) {
     if (0 == points.size()) return 0;
     std::sort(points.begin(), points.end(), [](vector<int> pa, vector<int> pb) {
-      return pa[1] > pb[1];
+      return pa[1] < pb[1];
     });
     vector<int> sorrow;
     sorrow.push_back(points[0][1]);
