@@ -1,7 +1,8 @@
 #include <iostream>
-#include <vector>
 #include <string>
 #include <stack>
+#include <numeric>
+
 using namespace std;
 
 class Solution {
@@ -35,37 +36,51 @@ public:
     now++;
     return true;
   }
+  
   int calculate(string s) {
     std::stack<int> data_stack;
-    data_stack.push(1);
-    int now_result = 0;
+    int data;
+    int data_type;
+    string::iterator s_iter = s.begin();
     int now_f = 1;
-    int data = 0;
-    int data_type = 0;
-    string::iterator iter_s = s.begin();
-    while (nextData(iter_s, s.end(), data, data_type)) {
+    int last_flag = 0;
+    while (nextData(s_iter, s.end(), data, data_type)) {
       if (data_type == 1) {
-        now_result += data * now_f * data_stack.top();
+        if (last_flag == 1) {
+          int temp_data = data_stack.top();
+          data_stack.pop();
+          data_stack.push(temp_data * data * now_f);
+          last_flag = 0;
+        } else if (last_flag == 2) {
+          int temp_data = data_stack.top();
+          data_stack.pop();
+          data_stack.push(temp_data / data * now_f);
+          last_flag = 0;
+        } else {
+          data_stack.push(data * now_f);
+        }
         now_f = 1;
       } else {
-        if (data == '(') {
-          data_stack.push(now_f * data_stack.top());
-          now_f = 1;
-        } else if (data == ')') {
-          data_stack.pop();
-          now_f = 1;
-        } else if (data == '-') {
+        if (data == '-') {
           now_f *= -1;
-        }
+        } else if (data == '*') {
+          last_flag = 1;
+        } else if (data == '/') {
+          last_flag = 2;
+        } 
       }
     }
-    return now_result;
+    int result = 0;
+    while (!data_stack.empty()) {
+      result += data_stack.top();
+      data_stack.pop();
+    }
+    return result;
   }
 };
 
-
 int main() {
   Solution s;
-  std::cout << s.calculate("(1+(4+5+2)-3)+(6+8)") << std::endl;
+  std::cout << s.calculate("3+2*2+3-3/2") << std::endl;
   return 0;
 }
